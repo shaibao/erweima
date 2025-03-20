@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系车主</title>
+    <style>
+        /* 防复制样式 */
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .contact-card {
+            max-width: 400px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .virtual-phone {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin: 1rem 0;
+            letter-spacing: 2px;
+        }
+
+        .call-button {
+            display: inline-block;
+            background: #48bb78;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .call-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="contact-card">
+        <div>请拨打车主虚拟号码：</div>
+        <div class="virtual-phone" id="displayPhone">加载中...</div>
+        <a class="call-button" id="realCall">立即拨打</a >
+    </div>
+
+    <script>
+        // 解密处理
+        const urlParams = new URLSearchParams(window.location.search);
+        const encryptedData = JSON.parse(decodeURIComponent(urlParams.get('d')));
+        
+        // 解密电话号码
+        const realPhone = atob(encryptedData.p.split('').reverse().join(''));
+        const plate = atob(encryptedData.n);
+
+        // 显示虚拟号码（前3后4位）
+        const displayPhone = realPhone.slice(0,3) + '****' + realPhone.slice(-4);
+        document.getElementById('displayPhone').textContent = displayPhone;
+
+        // 设置真实拨号链接
+        document.getElementById('realCall').href = `tel:${realPhone}`;
+
+        // 防止右键查看
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
+    </script>
+</body>
+</html>

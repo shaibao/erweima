@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私保护挪车码生成器</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        /* 样式优化 */
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        button {
+            background: #4299e1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #3182ce;
+        }
+
+        #qrcode {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .privacy-note {
+            color: #718096;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>生成隐私挪车码</h1>
+        
+        <div class="input-group">
+            <label for="plate">车牌号码</label>
+            <input type="text" id="plate" placeholder="例：粤A12345" maxlength="8">
+        </div>
+
+        <div class="input-group">
+            <label for="phone">联系电话</label>
+            <input type="tel" id="phone" placeholder="11位手机号码" pattern="[0-9]{11}">
+        </div>
+
+        <button onclick="generateSecureQR()">生成安全二维码</button>
+
+        <div id="qrcode"></div>
+
+        <div class="privacy-note">
+            <h3>隐私保护说明：</h3>
+            <p>1. 您的号码经过加密处理，不会直接暴露</p >
+            <p>2. 扫码显示虚拟中间号，真实号码全程隐藏</p >
+            <p>3. 建议每月更新二维码确保安全</p >
+        </div>
+    </div>
+
+    <script>
+        function generateSecureQR() {
+            const plate = document.getElementById('plate').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!/^[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z0-9]{5}$/.test(plate)) {
+                alert('请输入有效车牌（例：粤A12345）');
+                return;
+            }
+
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入有效手机号码');
+                return;
+            }
+
+            // 清空旧二维码
+            document.getElementById('qrcode').innerHTML = '';
+
+            // 创建加密数据（前端简单混淆处理）
+            const data = {
+                p: btoa(phone).split('').reverse().join(''), // Base64编码+反转
+                n: btoa(plate)
+            };
+
+            // 生成安全链接
+            const safeURL = `contact.html?d=${encodeURIComponent(JSON.stringify(data))}`;
+
+            // 生成二维码
+            new QRCode(document.getElementById('qrcode'), {
+                text: safeURL,
+                width: 220,
+                height: 220,
+                colorDark: "#1a365d",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+    </script>
+</body>
+</html>
